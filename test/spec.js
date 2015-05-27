@@ -108,8 +108,8 @@ describe('CmisJS library test', function () {
 
   it('should query the repository', function (done) {
     session.query("select * from cmis:document", false, {
-        maxItems: 3
-      })
+      maxItems: 3
+    })
       .ok(function (data) {
         assert(data.results.length == 3, 'Should find 3 documents');
         done();
@@ -318,8 +318,7 @@ describe('CmisJS library test', function () {
     });
   });
 
-  var docId;
-  var versionSeriesId;
+  var docId
   var txt = 'this is the document content';
   it('should create a document', function (done) {
     var aces = {}
@@ -327,7 +326,6 @@ describe('CmisJS library test', function () {
     session.createDocument(randomFolderId, txt, 'test.txt',
       'text/plain', undefined, undefined, aces).ok(function (data) {
       docId = data.succinctProperties['cmis:objectId'];
-      versionSeriesId = data.succinctProperties['cmis:versionSeriesId'];
       done();
     });
   });
@@ -348,31 +346,6 @@ describe('CmisJS library test', function () {
   it('should get document content', function (done) {
     session.getContentStream(docId).ok(function (data) {
       assert(data == txt, 'document content should be "' + txt + '"');
-      done();
-    });
-  });
-
-  var copyId;
-  it('should create a copy of the document', function (done) {
-    session.createDocumentFromSource(randomFolderId, docId, undefined, 'test-copy.txt')
-      .ok(function (data) {
-        copyId = data.succinctProperties['cmis:objectId'];
-        done();
-      }).notOk(function (res) {
-        assert(res.body.exception == 'notSupported', "not supported");
-        console.log("bulk update is not supported in this repository")
-        done();
-      });
-  });
-
-  it('should get copied document content', function (done) {
-    if (!copyId) {
-      console.log("skipping")
-      done();
-      return;
-    }
-    session.getContentStream(docId).ok(function (data) {
-      assert(data == txt, 'copied document content should be "' + txt + '"');
       done();
     });
   });
@@ -398,7 +371,7 @@ describe('CmisJS library test', function () {
     }).notOk(function (res) {
       var exc = res.body.exception;
       if (exc == 'constraint') {
-        assert(res.body.message.indexOf('checked out') !== -1, "checked out");
+        assert(res.body.message.indexOf('checked out')!==-1, "checked out");
         console.log("document already ckecked out");
         done();
       } else {
@@ -492,7 +465,7 @@ describe('CmisJS library test', function () {
   });
 
   it('should get object versions', function (done) {
-    session.getAllVersions(versionSeriesId).ok(function (data) {
+    session.getAllVersions(docId).ok(function (data) {
       assert(data[0].succinctProperties['cmis:versionLabel'] !== undefined, 'version label should be defined');
       done();
     }).notOk(function (res) {
